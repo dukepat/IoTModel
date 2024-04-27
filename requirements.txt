@@ -1,0 +1,5 @@
+mysql-connector
+azure-functions
+numpy
+joblib
+pandas

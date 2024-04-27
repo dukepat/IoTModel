@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Script Runner</title>
+</head>
+<body>
+    <h1>Python Script Runner</h1>
+    <form id="script-form" enctype="multipart/form-data">
+        <input type="file" id="script-file" name="script-file" accept=".py">
+        <button type="button" onclick="runScript()">Run Script</button>
+    </form>
+    <div id="output"></div>
+
+    <script>
+        function runScript() {
+            var form = document.getElementById("script-form");
+            var formData = new FormData(form);
+
+            fetch('/run-script', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("output").innerText = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
