@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Script Runner</title>
+    <style>
+        #spinner {
+            display: none;
+            margin: 20px auto;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <h1>Python Script Runner</h1>
@@ -11,10 +28,23 @@
         <input type="file" id="script-file" name="script-file" accept=".py">
         <button type="button" onclick="runScript()">Run Script</button>
     </form>
-    <div id="output"></div>
+    <div id="spinner"></div>
+    <div id="output-container">
+        <iframe id="output-frame" style="display: none; width: 100%; height: 400px; border: 1px solid #ccc;"></iframe>
+        <div id="error-message" style="display: none; color: red; margin-top: 20px;"></div>
+    </div>
 
     <script>
         function runScript() {
+            var spinner = document.getElementById("spinner");
+            var outputFrame = document.getElementById("output-frame");
+            var errorMessage = document.getElementById("error-message");
+
+            // Show spinner and hide output and error message
+            spinner.style.display = "block";
+            outputFrame.style.display = "none";
+            errorMessage.style.display = "none";
+
             var form = document.getElementById("script-form");
             var formData = new FormData(form);
 
@@ -22,11 +52,28 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
             .then(data => {
-                document.getElementById("output").innerText = data;
+                // Hide spinner and show output
+                spinner.style.display = "none";
+                outputFrame.style.display = "block";
+
+                // Display the response in the iframe
+                var iframe = document.getElementById("output-frame");
+                iframe.contentDocument.open();
+                iframe.contentDocument.write('<pre>' + data + '</pre>');
+                iframe.contentDocument.close();
             })
             .catch(error => {
+                // Hide spinner and show error message
+                spinner.style.display = "none";
+                errorMessage.style.display = "block";
+                errorMessage.textContent = 'Error: ' + error.message;
                 console.error('Error:', error);
             });
         }
